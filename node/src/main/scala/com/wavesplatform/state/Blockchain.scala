@@ -6,6 +6,7 @@ import com.wavesplatform.block.{Block, BlockHeader}
 import com.wavesplatform.common.state.ByteStr
 import com.wavesplatform.lang.ValidationError
 import com.wavesplatform.lang.script.Script
+import com.wavesplatform.lang.v1.compiler.Terms.EXPR
 import com.wavesplatform.settings.BlockchainSettings
 import com.wavesplatform.state.extensions.{AddressTransactions, BlockchainExtensions, Distributions}
 import com.wavesplatform.state.reader.LeaseDetails
@@ -95,6 +96,7 @@ trait Blockchain {
 
   def invokeScriptResult(txId: TransactionId): Either[ValidationError, InvokeScriptResult]
 
+  def continuationState(address: Address): Option[EXPR]
   /**
     * Retrieves hit source for the block at height.
     */

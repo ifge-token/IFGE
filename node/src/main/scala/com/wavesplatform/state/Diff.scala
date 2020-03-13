@@ -9,6 +9,7 @@ import com.wavesplatform.common.state.ByteStr
 import com.wavesplatform.features.BlockchainFeatures
 import com.wavesplatform.features.FeatureProvider._
 import com.wavesplatform.lang.script.Script
+import com.wavesplatform.lang.v1.compiler.Terms.EXPR
 import com.wavesplatform.state.diffs.FeeValidation
 import com.wavesplatform.transaction.Asset.IssuedAsset
 import com.wavesplatform.transaction.{Asset, Transaction}
@@ -149,7 +150,8 @@ case class Diff(
     sponsorship: Map[IssuedAsset, Sponsorship],
     scriptsRun: Int,
     scriptsComplexity: Long,
-    scriptResults: Map[ByteStr, InvokeScriptResult]
+    scriptResults: Map[ByteStr, InvokeScriptResult],
+    continuationStates: Map[Address, EXPR]
 )
 
 object Diff {
@@ -164,7 +166,8 @@ object Diff {
       assetScripts: Map[IssuedAsset, Option[(PublicKey, Script, Long)]] = Map.empty,
       accountData: Map[Address, AccountDataInfo] = Map.empty,
       sponsorship: Map[IssuedAsset, Sponsorship] = Map.empty,
-      scriptResults: Map[ByteStr, InvokeScriptResult] = Map.empty
+      scriptResults: Map[ByteStr, InvokeScriptResult] = Map.empty,
+      continuationStates: Map[Address, EXPR] = Map.empty
   ): Diff =
     Diff(
       transactions = LinkedHashMap(),
@@ -180,7 +183,8 @@ object Diff {
       sponsorship = sponsorship,
       scriptsRun = 0,
       scriptResults = scriptResults,
-      scriptsComplexity = 0
+      scriptsComplexity = 0,
+      continuationStates
     )
 
   def apply(
@@ -218,7 +222,22 @@ object Diff {
     )
 
   val empty =
-    new Diff(LinkedHashMap(), Map.empty, Map.empty, Map.empty, Map.empty, Map.empty, Map.empty, Map.empty, Map.empty, Map.empty, Map.empty, 0, 0, Map.empty)
+    new Diff(
+      LinkedHashMap(),
+      Map.empty,
+      Map.empty,
+      Map.empty,
+      Map.empty,
+      Map.empty,
+      Map.empty,
+      Map.empty,
+      Map.empty,
+      Map.empty,
+      Map.empty,
+      0,
+      0,
+      Map.empty
+    )
 
   implicit val diffMonoid: Monoid[Diff] = new Monoid[Diff] {
     override def empty: Diff = Diff.empty

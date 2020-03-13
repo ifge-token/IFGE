@@ -6,6 +6,8 @@ import com.wavesplatform.block.Block.BlockInfo
 import com.wavesplatform.common.state.ByteStr
 import com.wavesplatform.common.utils.EitherExt2
 import com.wavesplatform.lang.script.Script
+import com.wavesplatform.lang.v1.Serde
+import com.wavesplatform.lang.v1.compiler.Terms.EXPR
 import com.wavesplatform.state._
 import com.wavesplatform.transaction.Asset.IssuedAsset
 import com.wavesplatform.transaction.Transaction
@@ -181,4 +183,13 @@ object Keys {
   val AssetStaticInfoPrefix: Short = 60
   def assetStaticInfo(asset: IssuedAsset): Key[Option[AssetStaticInfo]] =
     Key.opt("asset-static-info", bytes(AssetStaticInfoPrefix, asset.id.arr), readAssetStaticInfo, writeAssetStaticInfo)
+
+  val ContinuationStatePrefix: Short = 61
+  def continuationState(addressId: AddressId): Key[Option[EXPR]] =
+    Key.opt(
+      "continuation-result",
+      addr(ContinuationStatePrefix, addressId),
+      Serde.deserialize(_),
+      Serde.serialize
+    )
 }

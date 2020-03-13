@@ -11,6 +11,7 @@ import com.wavesplatform.block.Block
 import com.wavesplatform.block.Block.BlockInfo
 import com.wavesplatform.common.state.ByteStr
 import com.wavesplatform.lang.script.Script
+import com.wavesplatform.lang.v1.compiler.Terms.EXPR
 import com.wavesplatform.metrics.LevelDBStats
 import com.wavesplatform.settings.DBSettings
 import com.wavesplatform.state.DiffToStateApplier.PortfolioUpdates
@@ -217,7 +218,8 @@ abstract class Caches(spendableBalanceChanged: Observer[(Address, Asset)]) exten
       totalFee: Long,
       reward: Option[Long],
       hitSource: ByteStr,
-      scriptResults: Map[ByteStr, InvokeScriptResult]
+      scriptResults: Map[ByteStr, InvokeScriptResult],
+      continuationStates: Map[BigInt, EXPR]
   ): Unit
 
   def append(diff: Diff, carryFee: Long, totalFee: Long, reward: Option[Long], htiSource: ByteStr, block: Block): Unit = {
@@ -294,7 +296,8 @@ abstract class Caches(spendableBalanceChanged: Observer[(Address, Asset)]) exten
       totalFee,
       reward,
       htiSource,
-      diff.scriptResults
+      diff.scriptResults,
+      diff.continuationStates.map { case (address, data) => addressId(address) -> data }
     )
 
     val emptyData = Map.empty[(Address, String), Option[DataEntry[_]]]

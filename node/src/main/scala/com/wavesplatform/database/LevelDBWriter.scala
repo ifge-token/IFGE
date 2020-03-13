@@ -18,6 +18,7 @@ import com.wavesplatform.database.protobuf.{BlockInfo => PBlockInfo}
 import com.wavesplatform.features.BlockchainFeatures
 import com.wavesplatform.lang.ValidationError
 import com.wavesplatform.lang.script.Script
+import com.wavesplatform.lang.v1.compiler.Terms.EXPR
 import com.wavesplatform.protobuf.block.{Block => PBlock}
 import com.wavesplatform.protobuf.transaction.PBTransactions
 import com.wavesplatform.settings.{BlockchainSettings, Constants, DBSettings}
@@ -275,7 +276,8 @@ class LevelDBWriter(
       totalFee: Long,
       reward: Option[Long],
       hitSource: ByteStr,
-      scriptResults: Map[ByteStr, InvokeScriptResult]
+      scriptResults: Map[ByteStr, InvokeScriptResult],
+      continuationStates: Map[AddressId, EXPR]
   ): Unit = readWrite { rw =>
     val expiredKeys = new ArrayBuffer[Array[Byte]]
 
@@ -509,6 +511,11 @@ class LevelDBWriter(
           case NonFatal(e) =>
             throw new RuntimeException(s"Error storing invoke script result for $txId: $result", e)
         }
+    }
+
+    continuationStates.foreach {
+      case (address, expr) =>
+        rw.put(Keys.continuationState(address), expr)
     }
 
     expiredKeys.foreach(rw.delete(_, "expired-keys"))
