@@ -1,3 +1,5 @@
+IFGE WAVES PLATFORM TOKEN 
+
 # Waves [![Build Status](https://travis-ci.org/wavesplatform/Waves.svg?branch=master)](https://travis-ci.org/wavesplatform/Waves)
 
 Waves is an open source [blockchain platform](https://wavesplatform.com/).
